@@ -49,8 +49,25 @@
             box-sizing: border-box;
         }
 
+        /* --- CORRECCIÓN: Slide 1 visible por defecto --- */
+        #slide-1 {
+            opacity: 1;
+        }
+
+        /* Animación de entrada para el título */
+        .title-anim {
+            animation: tracking-in-expand 1.5s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+            animation-delay: 0.5s; /* Espera pequeña tras el loader */
+        }
+
+        @keyframes tracking-in-expand {
+            0% { letter-spacing: -0.5em; opacity: 0; }
+            40% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
         h1 {
-            font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 8vw, 7rem);
+            font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 7rem);
             line-height: 1.1; margin-bottom: 20px; letter-spacing: -2px; text-transform: uppercase;
             text-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
         }
@@ -143,6 +160,10 @@
             position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
             font-family: 'Orbitron', sans-serif; font-size: 0.8rem; opacity: 0.7;
             animation: float 2s infinite ease-in-out; color: var(--cyan); width: 100%;
+            letter-spacing: 2px;
+        }
+        .scroll-arrow {
+            display: block; font-size: 1.5rem; margin-top: 10px;
         }
 
         @keyframes float { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
@@ -173,7 +194,7 @@
             .hud-grid { grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
             .info-grid { grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
             .info-box { padding: 20px; }
-            .hud-card { padding: 15px; transform: skewX(0deg); border-left: 2px solid var(--cyan); } /* Quitar skew en móvil para ahorrar espacio */
+            .hud-card { padding: 15px; transform: skewX(0deg); border-left: 2px solid var(--cyan); }
             .hud-card h3, .hud-card p { transform: skewX(0deg); }
             
             h1 { font-size: 2.5rem; }
@@ -184,11 +205,15 @@
             .objective-card { padding: 25px; }
             .objective-text { font-size: 1rem; }
             
-            /* Ajuste para el pipeline visual */
             .pipeline-text { font-size: 0.8rem !important; display: flex; flex-direction: column; gap: 10px; }
             .pipeline-arrow { transform: rotate(90deg); display: inline-block; }
         }
     </style>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -208,14 +233,19 @@
 
     <div id="scroll-track">
         
-        <!-- INTRO -->
+        <!-- SLIDE 1: PORTADA (MODIFICADO) -->
         <div class="slide" id="slide-1">
-            <h1>IA <span class="highlight-cyan">EYE</span><br>FATIGUE</h1>
-            <p>Bienestar digital en tu escritorio. Un sistema inteligente que cuida tu salud y optimiza tu rendimiento mientras trabajas.</p>
-            <div class="scroll-hint">DESLIZA PARA COMENZAR</div>
+            <!-- Título Animado -->
+            <h1 class="title-anim">EYE<br><span style="color:var(--cyan)">FATIGUE</span></h1>
+            
+            <!-- Indicación de Deslizar -->
+            <div class="scroll-hint">
+                DESLIZA HACIA ABAJO
+                <span class="scroll-arrow">▼</span>
+            </div>
         </div>
 
-        <!-- QUÉ DETECTA -->
+        <!-- SLIDE 2: QUÉ DETECTA -->
         <div class="slide" id="slide-2">
             <h2>Biometría <span class="highlight">Digital</span></h2>
             <p>Monitorización continua para identificar patrones de agotamiento.</p>
@@ -239,7 +269,7 @@
             </div>
         </div>
 
-        <!-- CÓMO FUNCIONA -->
+        <!-- SLIDE 3: CÓMO FUNCIONA -->
         <div class="slide" id="slide-3">
             <h2>El Cerebro <span class="highlight-cyan">Digital</span></h2>
             <p>Tecnología que trabaja en segundo plano sin interrupciones.</p>
@@ -250,7 +280,7 @@
             </div>
         </div>
 
-        <!-- OBJETIVO (Enfoque Salud PC) -->
+        <!-- SLIDE 4: OBJETIVO -->
         <div class="slide" id="slide-4">
             <h2>Tu Salud es <span class="highlight">Prioridad</span></h2>
             <div class="objective-card">
@@ -262,11 +292,10 @@
             </div>
         </div>
 
-        <!-- INFORMACIÓN ADICIONAL (Educativo / Técnico) -->
+        <!-- SLIDE INFO: ADICIONAL -->
         <div class="slide" id="slide-info">
             <h2>Inteligencia <span class="highlight-cyan">Responsable</span></h2>
             <div class="info-grid">
-                <!-- Usuario General -->
                 <div class="info-box">
                     <span class="info-label">PRIVACIDAD TOTAL</span>
                     <div class="info-title">Tus datos son tuyos</div>
@@ -274,28 +303,22 @@
                         Entendemos la importancia de la privacidad. Todo el análisis ocurre 100% dentro de tu ordenador. Ninguna imagen de tu rostro se guarda ni se envía a internet. Es seguro, privado y ético.
                     </p>
                 </div>
-                <!-- Experto / Curioso -->
                 <div class="info-box tech">
-                    <span class="info-label">ANALISIS INSTANTANEO</span>
+                    <span class="info-label">ANÁLISIS INSTANTANEO</span>
                     <div class="info-title">Análisis Instantáneo</div>
                     <p class="info-desc">
-                         El sistema interpreta tus señales faciales al instante.Calcula la frecuencia de parpadeo, identifica microsueños y mide la duración de cada bostezo para determinar tu nivel actual de fatiga sin almacenar información personal
-                    </p>
+                        El sistema interpreta tus señales faciales al instante.Calcula la frecuencia de parpadeo, identifica microsueños y mide la duración de cada bostezo para determinar tu nivel actual de fatiga sin almacenar información personal
                 </div>
             </div>
         </div>
 
-        <!-- FINAL -->
+        <!-- SLIDE 5: FINAL -->
         <div class="slide" id="slide-5">
             <h1>MEJORA TU<br>RENDIMIENTO</h1>
             <p>Integra la salud digital en tu rutina diaria hoy mismo.</p>
             <a href="#" class="btn-neural">PROBAR DEMO</a>
         </div>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <script>
         // --- DETECTAR MÓVIL ---
@@ -464,34 +487,34 @@
         // AJUSTES DE CÁMARA RESPONSIVOS
         const moveX = isMobile ? 20 : 40; // Menor movimiento lateral en móvil
 
-        // KEYFRAME 1: INTRO -> METRICS
-        tl.to(camera.position, { x: -moveX, y: 20, z: 60, duration: 2, ease: "power1.inOut" }, "k1")
+        // ANIMACIÓN: Slide 1 visible al inicio, se desvanece al hacer scroll
+        tl.to("#slide-1", { opacity: 0, scale: 2, filter: "blur(10px)", duration: 1 }, "k1")
+          .to(camera.position, { x: -moveX, y: 20, z: 60, duration: 2, ease: "power1.inOut" }, "k1")
           .to(camera.rotation, { y: -0.5, duration: 2 }, "k1")
-          .to("#slide-1", { opacity: 0, scale: 2, filter: "blur(10px)", duration: 1 }, "k1")
           .fromTo("#slide-2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 1 }, "-=0.5");
 
         // KEYFRAME 2: METRICS -> PIPELINE
-        tl.to(camera.position, { x: moveX, y: -30, z: 20, duration: 2, ease: "power1.inOut" }, "k2")
-          .to(camera.rotation, { y: 0.5, x: -0.2, duration: 2 }, "k2")
-          .to("#slide-2", { opacity: 0, scale: 2, x: isMobile ? 0 : -100, duration: 1 }, "k2") // En móvil no desplazar tanto X
+        tl.to(camera.position, { x: moveX, y: -30, z: 20, duration: 2, ease: "power1.inOut" })
+          .to(camera.rotation, { y: 0.5, x: -0.2, duration: 2 }, "<")
+          .to("#slide-2", { opacity: 0, scale: 2, x: isMobile ? 0 : -100, duration: 1 }, "<") // En móvil no desplazar tanto X
           .fromTo("#slide-3", { opacity: 0, scale: 0.8, x: isMobile ? 0 : 50 }, { opacity: 1, scale: 1, x: 0, duration: 1 }, "-=0.5");
 
         // KEYFRAME 3: PIPELINE -> OBJECTIVE
-        tl.to(camera.position, { x: 0, y: 0, z: -10, duration: 2, ease: "power2.inOut" }, "k3")
-          .to(camera.rotation, { y: 0, x: 0, duration: 2 }, "k3")
-          .to("#slide-3", { opacity: 0, scale: 2, filter: "blur(5px)", duration: 1 }, "k3")
+        tl.to(camera.position, { x: 0, y: 0, z: -10, duration: 2, ease: "power1.inOut" })
+          .to(camera.rotation, { y: 0, x: 0, duration: 2 }, "<")
+          .to("#slide-3", { opacity: 0, scale: 2, filter: "blur(5px)", duration: 1 }, "<")
           .fromTo("#slide-4", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 1 }, "-=0.5");
 
         // KEYFRAME 4: OBJECTIVE -> INFO
-        tl.to(camera.position, { x: 0, y: isMobile ? 20 : 40, z: -50, duration: 2, ease: "power1.inOut" }, "k4")
-          .to(camera.rotation, { x: 0.2, duration: 2 }, "k4")
-          .to("#slide-4", { opacity: 0, scale: 1.5, duration: 1 }, "k4")
+        tl.to(camera.position, { x: 0, y: isMobile ? 20 : 40, z: -50, duration: 2, ease: "power1.inOut" })
+          .to(camera.rotation, { x: 0.2, duration: 2 }, "<")
+          .to("#slide-4", { opacity: 0, scale: 1.5, duration: 1 }, "<")
           .fromTo("#slide-info", { opacity: 0, scale: 0.8, y: 50 }, { opacity: 1, scale: 1, y: 0, duration: 1 }, "-=0.5");
 
         // KEYFRAME 5: INFO -> CTA
-        tl.to(camera.position, { z: -120, y: 0, duration: 2 }, "k5")
-          .to(camera.rotation, { x: 0, duration: 2 }, "k5")
-          .to("#slide-info", { opacity: 0, scale: 2, duration: 1 }, "k5")
+        tl.to(camera.position, { z: -120, y: 0, duration: 2 })
+          .to(camera.rotation, { x: 0, duration: 2 }, "<")
+          .to("#slide-info", { opacity: 0, scale: 2, duration: 1 }, "<")
           .fromTo("#slide-5", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 1 }, "-=0.5");
 
         window.addEventListener('resize', () => {
